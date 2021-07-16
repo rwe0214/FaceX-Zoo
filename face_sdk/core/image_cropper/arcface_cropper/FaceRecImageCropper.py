@@ -108,7 +108,7 @@ class FaceRecImageCropper(BaseImageCropper):
     def __init__(self):
         super().__init__()
     
-    def crop_image_by_mat(self, image, landmarks):
+    def crop_image_by_mat(self, image, landmarks, crop_size=112, mode='arcface'):
         if len(landmarks) == 106 * 2:
             landmarks = lms106_2_lms5(landmarks)
         if len(landmarks) == 25 * 2:
@@ -119,5 +119,5 @@ class FaceRecImageCropper(BaseImageCropper):
         if channel != 3:
             print('Error input.')
         landmarks = landmarks.reshape((5,2))
-        cropped_image = norm_crop(image, landmarks)
+        cropped_image = norm_crop(image, landmarks, crop_size, mode)
         return cropped_image

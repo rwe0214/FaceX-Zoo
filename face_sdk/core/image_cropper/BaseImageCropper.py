@@ -13,7 +13,7 @@ class BaseImageCropper(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def crop_image_by_mat(self, image, landmarks):
+    def crop_image_by_mat(self, image, landmarks, crop_size=112, mode='arcface'):
         """Should be overridden by all subclasses.
         Used for online image cropping, input the original Mat, 
         and return the Mat obtained from the image cropping.
