@@ -30,11 +30,11 @@ class LFWEvaluator(object):
         self.pair_list = pairs_parser.parse_pairs()
         self.feature_extractor = feature_extractor
 
-    def test(self, model, detail=False):
+    def test(self, model, detail=False, far_target=1e-3):
         image_name2feature = self.feature_extractor.extract_online(model, self.data_loader)
         if detail:
             true_positive_rate, false_positive_rate, precision, recall, accuracy, roc_auc, best_distances, \
-                tar, far = self.test_one_model_detail(self.pair_list, image_name2feature)
+                tar, far = self.test_one_model_detail(self.pair_list, image_name2feature, far_target=far_target)
             return true_positive_rate, false_positive_rate, \
                     precision, recall, accuracy, roc_auc, \
                     best_distances, tar, far
@@ -42,7 +42,7 @@ class LFWEvaluator(object):
             mean, std = self.test_one_model(self.pair_list, image_name2feature)
             return mean, std
 
-    def test_one_model_detail(self, test_pair_list, image_name2feature, is_normalize = True):
+    def test_one_model_detail(self, test_pair_list, image_name2feature, is_normalize = True, far_target=1e-3):
         """Get the detail test result of a model from the external repo, facenet-pytorch-vggface2.
 
         Args:
@@ -94,7 +94,7 @@ class LFWEvaluator(object):
         return evaluate_lfw(
                     distances=distances,
                     labels=labels,
-                    far_target=1e-3
+                    far_target=far_target
                 )
 
     def test_one_model(self, test_pair_list, image_name2feature, is_normalize = True):
