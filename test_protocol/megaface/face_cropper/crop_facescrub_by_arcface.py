@@ -9,11 +9,11 @@ import math
 import multiprocessing
 import cv2
 import sys
-sys.path.append('/export/home/wangjun492/wj_armory/faceX-Zoo/face_sdk')
+sys.path.append('/home/swchiu/workspace/FaceX-Zoo/face_sdk')
 from core.image_cropper.arcface_cropper.FaceRecImageCropper import FaceRecImageCropper
 from utils.lms_trans import lms106_2_lms25
 
-def crop_facescrub(facescrub_root, facescrub_lms_file, target_folder):
+def crop_facescrub(facescrub_root, facescrub_lms_file, target_folder, crop_size=112, mode='arcface'):
     face_cropper = FaceRecImageCropper()
     facescrub_lms_file_buf = open(facescrub_lms_file)
     line = facescrub_lms_file_buf.readline().strip()
@@ -26,9 +26,10 @@ def crop_facescrub(facescrub_root, facescrub_lms_file, target_folder):
         assert(len(lms106) == 106 * 2)
         lms106 = [float(num) for num in lms106]
         cur_image_path = os.path.join(facescrub_root, image_name)
+        print(cur_image_path)
         assert(os.path.exists(cur_image_path))
         cur_image = cv2.imread(cur_image_path)
-        cur_cropped_image = face_cropper.crop_image_by_mat(cur_image, lms106)
+        cur_cropped_image = face_cropper.crop_image_by_mat(cur_image, lms106, crop_size, mode)
         target_path = os.path.join(target_folder, image_name)
         target_dir = os.path.dirname(target_path)
         if not os.path.exists(target_dir):
@@ -37,8 +38,12 @@ def crop_facescrub(facescrub_root, facescrub_lms_file, target_folder):
         line = facescrub_lms_file_buf.readline().strip()
 
 if __name__ == '__main__':
-    facescrub_root = '/export/home/wangjun492/wj_armory/face_group/faceX-Zoo/addition_module/face_mask_adding/FMA-3D/facescrub_mask'
-    facescrub_lms_file = '/export2/wangjun492/face_database/facex-zoo/share_file/test_data/megaface/facescrub_face_info.txt'
-    target_folder = '/export2/wangjun492/face_database/facex-zoo/private_file/test_data/megaface/face_crop_arcface/masked_facescrub_crop'
+    crop_size = 112
+    mode = 'arcface'
+    if mode == 'arcface':
+        assert crop_size==112
+    facescrub_root = '/mnt/disk1/megaface/facescrub_images'
+    facescrub_lms_file = '/mnt/disk1/megaface/facescrub_face_info.txt'
+    target_folder = f'/mnt/disk1/megaface/face_crop_arcface/facescrub_crop'
 
-    crop_facescrub(facescrub_root, facescrub_lms_file, target_folder)
+    crop_facescrub(facescrub_root, facescrub_lms_file, target_folder, crop_size, mode)
