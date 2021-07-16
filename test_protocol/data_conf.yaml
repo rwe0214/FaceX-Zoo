@@ -39,10 +39,10 @@ RFW_Indian:
     image_list_file_path: /export2/wangjun492/face_database/facex-zoo/private_file/test_data/rfw/RFW_crop/Indian_img_list.txt
 
 MegaFace:
-    facescrub_list: /export/home/wangjun492/wj_armory/face_rec/face_recognition_pytorch/test_protocal/megaface/megaface_test_kit/devkit/templatelists/facescrub_features_list.json
-    megaceface_list: /export/home/wangjun492/wj_armory/face_rec/face_recognition_pytorch/test_protocal/megaface/megaface_test_kit/devkit/templatelists/megaface_features_list.json_1000000_1
-    facescrub_noises_file: /export/home/wangjun492/wj_armory/face_rec/face_recognition_pytorch/test_protocal/megaface/megaface_test_kit/devkit/scripts/facescrub_noises.txt
-    megaface_noises_file: /export/home/wangjun492/wj_armory/face_rec/face_recognition_pytorch/test_protocal/megaface/megaface_test_kit/devkit/scripts/megaface_noises.txt
+    facescrub_list: /mnt/disk1/megaface/devkit/templatelists/facescrub_features_list.json
+    megaceface_list: /mnt/disk1/megaface/devkit/templatelists/megaface_features_list.json_1000000_1
+    facescrub_noises_file: /mnt/disk1/megaface/devkit/scripts/facescrub_noises.txt
+    megaface_noises_file: /mnt/disk1/megaface/devkit/scripts/megaface_noises.txt
     cropped_face_folder: /export2/wangjun492/face_database/facex-zoo/private_file/test_data/megaface/face_crop_arcface
     image_list_file: /export2/wangjun492/face_database/facex-zoo/private_file/test_data/megaface/face_crop_arcface/img_list.txt
     megaface-mask: 0
