@@ -30,10 +30,72 @@ class LFWEvaluator(object):
         self.pair_list = pairs_parser.parse_pairs()
         self.feature_extractor = feature_extractor
 
-    def test(self, model):
+    def test(self, model, detail=False):
         image_name2feature = self.feature_extractor.extract_online(model, self.data_loader)
-        mean, std = self.test_one_model(self.pair_list, image_name2feature)
-        return mean, std
+        if detail:
+            true_positive_rate, false_positive_rate, precision, recall, accuracy, roc_auc, best_distances, \
+                tar, far = self.test_one_model_detail(self.pair_list, image_name2feature)
+            return true_positive_rate, false_positive_rate, \
+                    precision, recall, accuracy, roc_auc, \
+                    best_distances, tar, far
+        else:
+            mean, std = self.test_one_model(self.pair_list, image_name2feature)
+            return mean, std
+
+    def test_one_model_detail(self, test_pair_list, image_name2feature, is_normalize = True):
+        """Get the detail test result of a model from the external repo, facenet-pytorch-vggface2.
+
+        Args:
+            test_pair_list(list): the pair list given by PairsParser.
+            image_name2feature(dict): the map of image name and it's feature.
+            is_normalize(bool): wether the feature is normalized.
+
+        Returns:
+            true_positive_rate
+            false_positive_rate
+            precision
+            recall
+            accuracy
+            roc_auc
+            best_distances
+            tar
+            far 
+        """
+        subsets_score_list = np.zeros((10, 600), dtype = np.float32)
+        subsets_label_list = np.zeros((10, 600), dtype = np.int8)
+
+        distances, labels = [], []
+        from torch.nn import PairwiseDistance
+        import torch
+        l2_distance = PairwiseDistance(p=2)
+        for index, cur_pair in enumerate(test_pair_list):
+            cur_subset = index // 600
+            cur_id = index % 600
+            image_name1 = cur_pair[0]
+            image_name2 = cur_pair[1]
+            label = cur_pair[2]
+            subsets_label_list[cur_subset][cur_id] = label
+            feat1 = image_name2feature[image_name1]
+            feat2 = image_name2feature[image_name2]
+            if not is_normalize:
+                feat1 = feat1 / np.linalg.norm(feat1)
+                feat2 = feat2 / np.linalg.norm(feat2)
+            cur_score = np.linalg.norm(feat1-feat2)
+            subsets_score_list[cur_subset][cur_id] = cur_score
+            distances.append(cur_score)
+            labels.append(label)
+
+        distances = np.array(distances)
+        labels = np.array(labels)
+        repo_path = '/home/yysung/repos/research/packages/facenet-pytorch-vggface2'
+        sys.path.append(os.path.join(repo_path))
+        from validate_on_LFW import evaluate_lfw
+        
+        return evaluate_lfw(
+                    distances=distances,
+                    labels=labels,
+                    far_target=1e-3
+                )
 
     def test_one_model(self, test_pair_list, image_name2feature, is_normalize = True):
         """Get the accuracy of a model.
