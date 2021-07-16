@@ -19,8 +19,9 @@ class CommonExtractor:
     Attributes:
         device(object): device to init model.
     """
-    def __init__(self, device):
+    def __init__(self, device, progress_visable=False):
         self.device = torch.device(device)
+        self.progress_visable = progress_visable
 
     def extract_online(self, model, data_loader):
         """Extract and return features.
@@ -34,8 +35,15 @@ class CommonExtractor:
         """
         model.eval()
         image_name2feature = {}
+
+        if self.progress_visable:
+            from tqdm.auto import tqdm
+            enumerated_data = enumerate(tqdm(data_loader))
+        else:
+            enumerated_data = enumerate(data_loader)
+
         with torch.no_grad(): 
-            for batch_idx, (images, filenames) in enumerate(data_loader):
+            for batch_idx, (images, filenames) in enumerated_data:
                 images = images.to(self.device)
                 features = model(images)
                 features = F.normalize(features)
